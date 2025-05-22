@@ -14,7 +14,7 @@ from pydantic import Field
 type Topic = Annotated[str, Field(pattern=r"^(?:(?:~/)?[a-zA-Z0-9_-]+)(?:/[a-zA-Z0-9_-]+)*$")]
 
 
-def check_mqtt_error(func: Callable[[...], pmq.enums.MQTTErrorCode], *args, **kwargs) -> None:
+def _check_mqtt_error(func: Callable[[...], pmq.enums.MQTTErrorCode], *args, **kwargs) -> None:
     if (err := func(*args, **kwargs)) != pmq.enums.MQTTErrorCode.MQTT_ERR_SUCCESS:
         raise RuntimeError(f"Failed to call function {func.__name__}: {err}")
 
@@ -134,7 +134,7 @@ class MQTTClient:
 
     def connect(self) -> bool:
         if not self._mqtt_client.is_connected():
-            check_mqtt_error(self._mqtt_client.connect, self._hostname, self._port)
+            _check_mqtt_error(self._mqtt_client.connect, self._hostname, self._port)
             self._mqtt_client.loop_start()
             return self._mqtt_queue.get()
         return False
@@ -143,7 +143,7 @@ class MQTTClient:
         if self._mqtt_client.is_connected():
             while self._mqtt_client.want_write():
                 time.sleep(0.01)
-            check_mqtt_error(self._mqtt_client.disconnect)
+            _check_mqtt_error(self._mqtt_client.disconnect)
 
     def publish(
             self,
