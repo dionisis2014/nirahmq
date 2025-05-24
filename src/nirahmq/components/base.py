@@ -157,7 +157,7 @@ class Availability(BaseModel):
     payload_not_available: Optional[str] = 'offline'
 
     @model_validator(mode='after')
-    def check_stuff(self) -> Self:
+    def _check_stuff(self) -> Self:
         if self.availability is not Unset and self.availability_topic is not Unset:
             raise ValueError('`availability_topic` and `availability` are mutually exclusive')
         return self
