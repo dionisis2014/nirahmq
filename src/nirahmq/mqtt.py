@@ -91,6 +91,11 @@ class MQTTClient:
             reason: pmq.reasoncodes.ReasonCode,
             properties: pmq.properties.Properties | None
     ) -> None:
+        if reason.value != 0:
+            self._mqtt_client.disconnect()
+            self._mqtt_queue.put(False)
+            return
+
         if not self._subscriptions.empty():
             opts = SubscribeOptions()
             topics = []
@@ -110,6 +115,7 @@ class MQTTClient:
             self,
             client: pmq_client.Client,
             userdata: Any,
+            flags: pmq_client.DisconnectFlags,
             reason: pmq.reasoncodes.ReasonCode,
             properties: pmq.properties.Properties | None
     ) -> None:
