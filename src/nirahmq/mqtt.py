@@ -20,12 +20,23 @@ def _check_mqtt_error(func: Callable[[...], pmq.enums.MQTTErrorCode], *args, **k
 
 
 class QoS(IntEnum):
+    """MQTT Quality of Service (QoS) enumeration class."""
+
     MOST = 0  # At most once
+    """Message is delivered at most once."""
     LEAST = 1  # At least once
+    """Message is delivered at least once."""
     EXACTLY = 2  # Exactly once
+    """Message is delivered exactly once."""
 
 
 class MQTTClient:
+    """NirahMQ MQTT client class
+
+    This class is responsible for establishing a connection to the MQTT broker, handles authentication, callback
+    registration and subscription, as well as publishing arbitrary payloads to any MQTT topic.
+    """
+
     _mqtt_client: pmq_client.Client
     _mqtt_queue: SimpleQueue
 
@@ -43,6 +54,17 @@ class MQTTClient:
             password: str | None = None,
             client_id: str = "nirahmq"
     ):
+        """Initialize the MQTT client.
+
+        .. caution::
+            Currently there is no TLS support! Authentication details and messages are sent on plaintext!
+
+        :param str hostname: The MQTT broker hostname
+        :param int port: The MQTT broker port
+        :param str username: The MQTT broker username
+        :param str password: The MQTT broker password
+        :param str client_id: The MQTT broker client ID
+        """
         self._hostname = hostname
         self._port = port
         self._client_id = client_id
@@ -73,14 +95,29 @@ class MQTTClient:
 
     @property
     def hostname(self) -> str:
+        """The configured MQTT broker hostname (read-only).
+
+        :return: The configured hostname
+        :rtype: str
+        """
         return self._hostname
 
     @property
     def port(self) -> int:
+        """The configured MQTT broker port (read-only).
+
+        :return: The configured port
+        :rtype: int
+        """
         return self._port
 
     @property
     def client_id(self) -> str:
+        """The configured MQTT client ID (read-only).
+
+        :return: The configured client ID
+        :rtype: str
+        """
         return self._client_id
 
     def _on_connect(
@@ -123,9 +160,28 @@ class MQTTClient:
 
     # TODO: This thing acts weird. Needs more investigating
     def set_will(self, topic: str, payload: str) -> None:  # NOTE: Must be called before `connect`
+        """Set the MQTT Last Will and Testament (LWT) payload and topic.
+
+        Set the MQTT topic and payload that the MQTT broker will publish to when the client disconnects unexpectedly.
+
+        .. note::
+            Must be called before connection.
+            Does nothing otherwise.
+
+        :param str topic: The LWT topic
+        :param str payload: The LWT payload
+        """
         self._mqtt_client.will_set(topic, payload)
 
     def add_callback(self, topic: str, callback: Callable[[bytes | bytearray], None]) -> None:
+        """Register a callback to an MQTT topic.
+
+        Subscribes to the specified MQTT topic and registers a user supplied callback to it.
+        See :py:meth:`remove_callback` for how to remove a callback.
+
+        :param str topic: The MQTT topic to register the callback to
+        :param Callable[[bytes | bytearray], None] callback: The callback to register
+        """
         self._mqtt_client.message_callback_add(topic, lambda c, u, m: callback(m.payload))
         if self._mqtt_client.is_connected():
             self._mqtt_client.subscribe((topic, SubscribeOptions()))
@@ -133,12 +189,35 @@ class MQTTClient:
             self._subscriptions.put(topic)
 
     def remove_callback(self, topic: str) -> None:
+        """Unregister a callback to an MQTT topic.
+
+        Removes a previously registered callback with :py:meth:`add_callback`
+        and unsubscribes from the associated MQTT topic.
+        See :py:meth:`add_callback` for how to add a callback.
+
+        .. note::
+            The instance must be connected to take effect.
+            Does nothing otherwise.
+
+        :param str topic: The topic to remove the callback from
+        """
         if self._mqtt_client.is_connected():
             # TODO: Needs more testing. Is it safe immediately return after `message_callback_remove`
             self._mqtt_client.message_callback_remove(topic)
             self._mqtt_client.unsubscribe(topic)
 
     def connect(self) -> bool:
+        """Connect to the MQTT broker.
+
+        Attempt to connect to the MQTT broker with the configured settings.
+        If the connection was successful, returns True.
+        If the connection failed or the instance is already connected, returns False.
+
+        :return: True if the connection was successful
+        :rtype: bool
+
+        :raises RuntimeError: If the connection was not successful
+        """
         if not self._mqtt_client.is_connected():
             _check_mqtt_error(self._mqtt_client.connect, self._hostname, self._port)
             self._mqtt_client.loop_start()
@@ -146,6 +225,13 @@ class MQTTClient:
         return False
 
     def disconnect(self) -> None:
+        """Disconnect from the MQTT broker.
+
+        Disconnect from the connected MQTT broker.
+        Does nothing if the instance is already disconnected.
+
+        :raises RuntimeError: If the connection was not successfully terminated
+        """
         if self._mqtt_client.is_connected():
             while self._mqtt_client.want_write():
                 time.sleep(0.01)
@@ -158,5 +244,17 @@ class MQTTClient:
             qos: QoS = QoS.MOST,
             retain: bool = True
     ) -> None:
+        """Publish an arbitrary payload to the specified MQTT topic.
+
+        Publish an arbitrary payload to the specified MQTT topic.
+        Optionally, set the Quality of Service (QoS) and retain flag for the message.
+
+        Does nothing if the instance is not connected to an MQTT broker.
+
+        :param str topic: The MQTT topic to publish the payload to
+        :param str | bytes | bytearray | int | float | None payload: The payload to publish
+        :param QoS qos: The QoS to use
+        :param bool retain: Retain flag
+        """
         if self._mqtt_client.is_connected():
             self._mqtt_client.publish(topic, payload, int(qos), retain)
