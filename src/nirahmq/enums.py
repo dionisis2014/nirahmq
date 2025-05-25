@@ -6,6 +6,8 @@ from enum import Enum, StrEnum
 
 # Components
 class Platform(StrEnum):
+    """The platform identifying each Home Assistant component supported by the MQTT integration."""
+
     ALARM_CONTROL_PANEL = "alarm_control_panel"
     BINARY_SENSOR = 'binary_sensor'
     BUTTON = 'button'
@@ -38,9 +40,23 @@ class Platform(StrEnum):
 
 
 class Category(Enum):
+    """The category of a component inside the device."""
+
     NORMAL = None
+    """The default category in Home Assistant when not specified.
+    
+    A component of this category is actively providing useful information about the functionality of the device.
+    """
     CONFIG = 'config'
+    """The component configures the device in some way
+    
+    A component of this category represents a configuration state in a device and not a measurement or action.
+    """
     DIAGNOSTIC = 'diagnostic'
+    """The component is only for diagnostic purposes.
+    
+    A component of this category represents a state or action of the underlying system in the device.
+    """
 
 
 # Device Classes
@@ -256,9 +272,14 @@ class TemperatureUnit(StrEnum):
 
 
 class Precision(Enum):
+    """The precision to use for this component."""
+
     HIGH = 0.1
+    """Values are multiple of ``0.1``"""
     MEDIUM = 0.5
+    """Values are multiple of ``0.5``"""
     LOW = 1.0
+    """Values are multiple of ``1``"""
 
 
 # Enums
