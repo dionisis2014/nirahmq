@@ -6,15 +6,16 @@ import re
 from functools import cached_property
 from typing import Self
 
-from pydantic import SerializeAsAny, conlist, model_validator, Field
+from pydantic import Field, SerializeAsAny, conlist, model_validator
 
-from nirahmq.components import BareEntityBase
-from nirahmq.components.base import Availability, ComponentBase, EntityBase, ComponentCallback, ComponentDefaultCallback
+from nirahmq.components.base import Availability, BareEntityBase, ComponentBase, ComponentCallback, EntityBase
 from nirahmq.mqtt import MQTTClient, QoS
 from nirahmq.utils import BaseModel, Optional, Unset, sanitize_string
 
 
 class DeviceInfo(BaseModel):
+    """Dataclass that stores information about a Home Assistant device."""
+
     configuration_url: Optional[str] = Unset
     connections: Optional[conlist(tuple[str, str], min_length=1)] = Unset
     hw_version: Optional[str] = Unset
@@ -65,12 +66,16 @@ class DeviceInfo(BaseModel):
 
 
 class OriginInfo(BaseModel):
+    """Dataclass that stores the Home Assistant device origin information."""
+
     name: str
     sw_version: Optional[str] = Unset
     support_url: Optional[str] = Unset
 
 
 class DiscoveryInfo(Availability):
+    """Dataclass that stores the discovery info used for Home Assistant device discovery."""
+
     device: DeviceInfo
     origin: OriginInfo
     command_topic: Optional[str] = Unset
@@ -81,6 +86,16 @@ class DiscoveryInfo(Availability):
 
 
 class Device:
+    """A wrapper class for a Home Assistant device.
+
+    The class stores an instance of an :py:class:`nirahmq.mqtt.MQTTClient` and :py:class:`DiscoveryInfo`.
+    At initialization, they are configured, command topics are subscribed to and callbacks are registered.
+    At runtime, availability and dynamic component addition and removal are managed automatically.
+
+    .. tip::
+        The class can be used as a dictionary proxy to the provided :py:attr:`DiscoveryInfo.components` attribute.
+    """
+
     _mqtt_client: MQTTClient
     _discovery_info: DiscoveryInfo
 
@@ -105,6 +120,21 @@ class Device:
             remove_on_exit: bool = False,
             status_callback: ComponentCallback['Device'] | None = None
     ) -> None:
+        """Initialize the Home Assistant device wrapper.
+
+        :param MQTTClient mqtt_client: The MQTT client instance to use
+        :param DiscoveryInfo discovery_info: The Home Assistant device discovery information
+        :param str | None node_id: The `node_id` to use in MQTT topics
+        :param str discovery_prefix: The MQTT topic prefix Home Assistant uses for discovery
+        :param str state_prefix: The MQTT topic prefix to use for state and command topics
+        :param bool use_status: Use availability
+        :param bool remove_on_exit: Remove device on disconnect
+        :param ComponentCallback['Device'] | None status_callback: The callback to call when Home Assistant
+            publishes and availability message
+
+        .. tip::
+            Set the ``node_id`` when using multiple devices to group them together for better organization.
+        """
         self._mqtt_client = mqtt_client
         self._discovery_info = discovery_info
         self._node_id = sanitize_string(node_id) if node_id is not None else None
@@ -229,6 +259,7 @@ class Device:
             component.unique_id = sha256.hexdigest()
 
     def announce(self) -> None:
+        """Send the Home Assistant discovery message."""
         self._mqtt_client.publish(
             self._discovery_topic,
             self._discovery_info.model_dump_json(exclude_unset=True, by_alias=True),
@@ -241,6 +272,14 @@ class Device:
             component: ComponentBase,
             announce: bool = True
     ) -> None:
+        """Register a new component with Home Assistant.
+
+        :param str name: The internal name of the component to use
+        :param ComponentBase component: The component to register
+        :param bool announce: Whether to announce the registration
+
+        :raises ValueError: If the component with the specified name is already registered
+        """
         if name in self._discovery_info.components:
             raise ValueError(f"Component '{name}' is already registered")
         self._discovery_info.components[name] = component
@@ -249,6 +288,13 @@ class Device:
             self.announce()
 
     def remove_component(self, name: str, announce: bool = True) -> None:
+        """Unregister a component from Home Assistant.
+
+        :param str name: The internal name of the component
+        :param bool announce: Whether to announce the deregistration
+
+        :raises ValueError: If the component with the specified name isn't registered
+        """
         try:
             if announce:
                 # Send an empty entity with `platform` key only to remove component
@@ -263,6 +309,7 @@ class Device:
             raise ValueError(f"Component '{name}' is not registered")
 
     def remove(self) -> None:
+        """Remove the device from Home Assistant and cleanup leftover topics."""
         for component in self._discovery_info.components.values():
             component._on_remove()
         if self._use_status:
@@ -276,6 +323,12 @@ class Device:
         )
 
     def set_availability(self, state: bool) -> None:
+        """Set device availability state.
+
+        Only works if ``use_status`` was set to ``True`` in :py:class:`Device` constructor.
+
+        :param bool state: The availability state
+        """
         if self._use_status:
             for topic, online, offline in self._discovery_info.get_availability_topics():
                 self._mqtt_client.publish(topic, online if state else offline)
