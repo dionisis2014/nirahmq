@@ -68,7 +68,6 @@ viewcode_line_numbers = True
 # Theme settings
 html_theme = 'furo'
 html_theme_options = {
-    'announcement': '<em>This library is still in ALPHA!</em>',
     'footer_icons': [
         {
             'name': 'GitHub',
