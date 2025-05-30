@@ -38,7 +38,7 @@ intersphinx_mapping = {
 # Sphinx multiversion settings
 smv_tag_whitelist = r'v\d+\.\d+\.\d+.*$'
 smv_branch_whitelist = r'master|dev'
-smv_remote_whitelist = None
+smv_remote_whitelist = r'origin'
 smv_released_pattern = r'^refs/(tags/v\d+\.\d+\.\d+|heads/master)$'
 smv_outputdir_format = '{ref.name}'
 smv_prefer_remote_refs = False
