@@ -8,8 +8,8 @@ on:
 
 jobs:
   build:
-    name: Build package
-    uses: ./.github/workflows/build.yaml
+    name: Run CI workflow
+    uses: ./.github/workflows/ci.yaml
   release:
     name: Create GitHub release
     runs-on: ubuntu-latest
