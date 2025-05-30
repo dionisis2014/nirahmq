@@ -91,7 +91,6 @@ html_theme_options = {
 }
 html_title = "NirahMQ"
 html_style = 'css/theme.css'
-# html_baseurl = 'https://dionisis2014.github.io/nirahmq'
 html_static_path = ['static']
 html_sidebars = {
     '**': [
