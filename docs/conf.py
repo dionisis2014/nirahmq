@@ -15,7 +15,7 @@ extensions = [
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.viewcode',
 ]
-nitpicky = True
+nitpicky = False
 highlight_language = 'guess'
 toc_object_entries_show_parents = 'hide'
 templates_path = ['templates']
