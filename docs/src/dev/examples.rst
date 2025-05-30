@@ -22,11 +22,9 @@ First import all the necessary modules:
 Declare the switch callback
 ---------------------------
 
-The switch command callback is called each time a payload is sent from
-Home Assistant to the switch. The expected payloads are
-:py:attr:`Switch.payload_on <nirahmq.components.Switch.payload_on>` for activating
-and :py:attr:`Switch.payload_off <nirahmq.components.Switch.payload_off>` for
-deactivating the switch.
+The switch command callback is called each time a payload is sent from Home Assistant to the switch.
+The expected payloads are :py:attr:`Switch.payload_on <nirahmq.components.Switch.payload_on>` for activating
+and :py:attr:`Switch.payload_off <nirahmq.components.Switch.payload_off>` for deactivating the switch.
 
 .. literalinclude:: examples/example-switch.py
     :lineno-start: 5
@@ -34,10 +32,8 @@ deactivating the switch.
 
 .. note::
     Notice that the switch component is sending its new state back to Home Assistant.
-    Is :py:attr:`Switch.optimistic <nirahmq.components.Switch.optimistic>` was
-    set to ``True`` manually or by not defining
-    :py:attr:`Switch.state_topic <nirahmq.components.Switch.state_topic>`,
-    this would not be required.
+    Is :py:attr:`Switch.optimistic <nirahmq.components.Switch.optimistic>` was set to ``True`` manually or by not
+    defining :py:attr:`Switch.state_topic <nirahmq.components.Switch.state_topic>`, this would not be required.
 
 Declare the discovery info
 --------------------------
@@ -51,8 +47,8 @@ Declare a bare bones device with a single switch component.
 Main program
 ------------
 
-The preferred way to use the :py:class:`~nirahmq.device.Device` and
-:py:class:`~nirahmq.mqtt.MQTTClient` classes is inside a context manager.
+The preferred way to use the :py:class:`~nirahmq.device.Device` and :py:class:`~nirahmq.mqtt.MQTTClient` classes is
+inside a context manager.
 
 .. literalinclude:: examples/example-switch.py
     :lineno-start: 29
@@ -86,8 +82,8 @@ First import all the necessary modules:
 Declare the light callback
 ---------------------------
 
-The light command callback is called each time a payload is sent from
-Home Assistant to the light. The expected payloads are JSON encoded.
+The light command callback is called each time a payload is sent from Home Assistant to the light.
+The expected payloads are JSON encoded.
 
 .. important::
     Currently only the JSON schema is supported with the :py:class:`~nirahmq.components.Light` component.

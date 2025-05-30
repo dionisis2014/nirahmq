@@ -10,9 +10,8 @@ For more examples see :doc:`dev/examples`.
 
 .. seealso::
 
-    If you don't have an MQTT broker installed on Home Assistant,
-    like `Mosquitto <https://mosquitto.org/>`_, have a look at the
-    `documentation <https://www.home-assistant.io/integrations/mqtt#broker-configuration>`_.
+    If you don't have an MQTT broker installed on Home Assistant, like `Mosquitto <https://mosquitto.org/>`_,
+    have a look at the `documentation <https://www.home-assistant.io/integrations/mqtt#broker-configuration>`_.
 
 .. tip::
 

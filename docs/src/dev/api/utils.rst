@@ -14,5 +14,5 @@ Utils
 
 .. autoattribute:: nirahmq.utils.Required
 
-    A custom type used by :py:class:`nirahmq.components.base.ComponentBase` to
-    mark a class field as required during serialization.
+    A custom type used by :py:class:`nirahmq.components.base.ComponentBase` to mark a class field as required
+    during serialization.
