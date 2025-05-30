@@ -42,7 +42,7 @@ class DeviceInfo(BaseModel):
         if self.use_hash:
             sha256 = hashlib.sha256()
             if self.name is not Unset:
-                sha256.update(self.name.encode())
+                sha256.update(self.name.encode())  # pylint: disable=no-member
             if self.identifiers is not None:
                 # Token can be whole strings or character in single string. Same result either way
                 for token in self.identifiers:
