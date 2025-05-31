@@ -43,3 +43,18 @@ jobs:
         run: pip install .[dev]
       - name: Run Pylint
         run: pylint --output-format github ./src/nirahmq
+  doc-cov:
+    name: Run docstring coverage
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.12'
+      - name: Setup build dependencies
+        run: pip install .[dev]
+      - name: Run Interrogate
+        run: interrogate src
