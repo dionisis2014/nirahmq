@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build package
+  test-build:
+    name: Test building package
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,7 +42,7 @@ jobs:
         run: pip install .[dev]
       - name: Run Pylint
         run: pylint --output-format github ./src/nirahmq
-  doc-cov:
+  cov-docstr:
     name: Run docstring coverage
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -60,7 +60,7 @@ jobs:
   wheels:
     name: Build package wheels
     runs-on: ubuntu-latest
-    needs: [ build, lint, doc-cov ]
+    needs: [ test-build, lint, cov-docstr ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
