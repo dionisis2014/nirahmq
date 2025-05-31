@@ -56,7 +56,7 @@ jobs:
       - name: Setup build dependencies
         run: pip install .[dev]
       - name: Run Interrogate
-        run: interrogate src
+        run: interrogate -vv src
   wheels:
     name: Build package wheels
     runs-on: ubuntu-latest
