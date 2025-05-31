@@ -90,7 +90,6 @@ html_theme_options = {
     ]
 }
 html_title = "NirahMQ"
-html_static_path = ['static']
 html_sidebars = {
     '**': [
         'sidebar/brand.html',
