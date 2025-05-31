@@ -42,7 +42,7 @@ classifiers = [
 Homepage = "https://github.com/dionisis2014/nirahmq"
 Source = "https://github.com/dionisis2014/nirahmq"
 Download = "https://github.com/dionisis2014/nirahmq/releases"
-Documentation = "https://github.com/dionisis2014/nirahmq"
+Documentation = "https://dionisis2014.github.io/nirahmq/master/"
 Issues = "https://github.com/dionisis2014/nirahmq/issues"
 
 [project.optional-dependencies]
