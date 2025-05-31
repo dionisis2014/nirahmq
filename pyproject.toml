@@ -47,7 +47,7 @@ Issues = "https://github.com/dionisis2014/nirahmq/issues"
 
 [project.optional-dependencies]
 docs = ["sphinx", "sphinx-multiversion", "sphinx-copybutton", "furo"]
-dev = ["pylint"]
+dev = ["pylint", "interrogate"]
 
 [build-system]
 requires = ["hatchling >= 1.26", "hatch-vcs"]
@@ -62,3 +62,6 @@ jobs = 0
 
 [tool.pylint.format]
 max-line-length = 120
+
+[tool.interrogate]
+fail-under = 80
