@@ -1,5 +1,8 @@
 # NirahMQ
 
+![PyPI - Version](https://img.shields.io/pypi/v/nirahmq?label=PyPI)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/dionisis2014/nirahmq/ci.yaml?logo=github&label=CI)
+
 A complete Home Assistant MQTT Python library with ease of use in mind
 
 > [!WARNING]
