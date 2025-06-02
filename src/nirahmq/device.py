@@ -8,7 +8,8 @@ from typing import Self
 
 from pydantic import Field, SerializeAsAny, conlist, model_validator
 
-from nirahmq.components.base import Availability, BareEntityBase, ComponentBase, ComponentCallback, EntityBase
+from nirahmq.components.base import Availability, BareEntityBase, CommandTopic, ComponentBase, ComponentCallback, \
+    EntityBase, StateTopic
 from nirahmq.mqtt import MQTTClient, QoS
 from nirahmq.utils import BaseModel, Optional, Unset, sanitize_string
 
@@ -78,8 +79,8 @@ class DiscoveryInfo(Availability):
 
     device: DeviceInfo
     origin: OriginInfo
-    command_topic: Optional[str] = Unset
-    state_topic: Optional[str] = Unset
+    command_topic: Optional[CommandTopic] = Unset
+    state_topic: Optional[StateTopic] = Unset
     qos: Optional[QoS] = Unset
     encoding: Optional[str] = Unset
     components: dict[str, SerializeAsAny[ComponentBase]]
